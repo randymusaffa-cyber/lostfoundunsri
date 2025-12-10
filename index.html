@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Lost & Found Kampus UNSRI</title>
+  <style>
+    body {font-family: Arial, sans-serif; margin:0; background:#f9f9f9;}
+    header {background:#004080; color:white; padding:15px; text-align:center;}
+    header img {height:80px; float:left; margin-right:15px;}
+    nav {background:#ffcc00; padding:10px; text-align:center;}
+    nav a {color:#004080; margin:0 15px; text-decoration:none; font-weight:bold;}
+    nav a:hover {text-decoration:underline;}
+    .container {padding:20px; max-width:1000px; margin:auto;}
+    .card {background:white; padding:20px; margin:15px 0; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    h2 {color:#004080;}
+    input, textarea, select, button {width:100%; padding:8px; margin:5px 0;}
+    button {background:#004080; color:white; border:none; cursor:pointer;}
+    button:hover {background:#00264d;}
+    .foto-preview {max-width:200px; margin-top:10px; display:none;}
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo-unsri.png" alt="Logo UNSRI">
+  <h1>Lost & Found Kampus UNSRI</h1>
+  <p>Universitas Sriwijaya - Fakultas Ilmu Komputer</p>
+</header>
+
+<nav>
+  <a href="#lapor">Lapor Barang</a>
+  <a href="#hilang">Barang Hilang</a>
+  <a href="#temuan">Barang Ditemukan</a>
+  <a href="#kontak">Kontak</a>
+</nav>
+
+<div class="container">
+  <!-- Form Laporan -->
+  <section id="lapor" class="card">
+    <h2>📝 Lapor Barang</h2>
+    <form id="laporanForm">
+      <label>Status Barang:</label>
+      <select id="status">
+        <option value="hilang">Hilang</option>
+        <option value="ditemukan">Ditemukan</option>
+      </select>
+
+      <label>Nama Barang:</label>
+      <input type="text" id="barang" required>
+
+      <label>Lokasi:</label>
+      <input type="text" id="lokasi" required>
+
+      <label>Deskripsi:</label>
+      <textarea id="deskripsi" required></textarea>
+
+      <label>Nomor Telepon:</label>
+      <input type="tel" id="telepon" required>
+
+      <label>Upload Foto:</label>
+      <input type="file" id="foto" accept="image/*" onchange="previewFoto(this)">
+      <img id="preview" class="foto-preview">
+
+      <button type="submit">Kirim Laporan</button>
+    </form>
+  </section>
+
+  <!-- Barang Hilang -->
+  <section id="hilang" class="card">
+    <h2>🚨 Barang Hilang</h2>
+    <ul id="daftarHilang"></ul>
+  </section>
+
+  <!-- Barang Ditemukan -->
+  <section id="temuan" class="card">
+    <h2>🔎 Barang Ditemukan</h2>
+    <ul id="daftarTemuan"></ul>
+  </section>
+
+  <!-- Kontak -->
+  <section id="kontak" class="card">
+    <h2>📞 Kontak Admin</h2>
+    <p>Email: <strong>lostfound@unsri.ac.id</strong></p>
+    <p>Telepon: <strong>(0711) 379249</strong></p>
+  </section>
+</div>
+
+<footer>
+  <p>&copy; 2025 Universitas Sriwijaya - Lost & Found Kampus</p>
+</footer>
+
+<script>
+  const form = document.getElementById("laporanForm");
+  const daftarHilang = document.getElementById("daftarHilang");
+  const daftarTemuan = document.getElementById("daftarTemuan");
+  const preview = document.getElementById("preview");
+
+  function previewFoto(input){
+    const file = input.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let status = document.getElementById("status").value;
+    let barang = document.getElementById("barang").value;
+    let lokasi = document.getElementById("lokasi").value;
+    let deskripsi = document.getElementById("deskripsi").value;
+    let telepon = document.getElementById("telepon").value;
+    let fotoSrc = preview.src;
+
+    let li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${barang}</strong> (${status})<br>
+      Lokasi: ${lokasi}<br>
+      Deskripsi: ${deskripsi}<br>
+      Kontak: ${telepon}<br>
+      ${fotoSrc ? `<img src="${fotoSrc}" style="max-width:150px;">` : ""}
+      <br><button onclick="markFound(this)">Tandai Sudah Ditemukan</button>
+    `;
+
+    if(status === "hilang"){
+      daftarHilang.appendChild(li);
+    } else {
+      daftarTemuan.appendChild(li);
+    }
+
+    alert("Laporan berhasil ditambahkan!");
+    form.reset();
+    preview.style.display = "none";
+  });
+
+  function markFound(button){
+    let li = button.parentElement;
+    button.remove();
+    daftarTemuan.appendChild(li);
+  }
+</script>
+
+</body>
+</html>
