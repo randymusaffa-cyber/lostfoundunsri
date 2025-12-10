@@ -16,6 +16,8 @@
     .container {max-width:1000px; margin:auto; padding:20px;}
     .card {background:white; padding:20px; margin:15px 0; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
     h2 {color:#004080;}
+    .item {border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:6px;}
+    .item img {max-width:150px; border-radius:6px; margin-top:6px;}
     button {background:#004080; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;}
     button:hover {background:#00264d;}
     footer {background:#eee; text-align:center; padding:15px; margin-top:20px; font-size:14px;}
@@ -33,24 +35,31 @@
 
 <nav>
   <a href="#form">Form Laporan</a>
+  <a href="#hilang">Barang Hilang</a>
+  <a href="#temuan">Barang Ditemukan</a>
   <a href="#kontak">Kontak Admin</a>
 </nav>
 
 <div class="container">
   <!-- Google Form -->
   <section id="form" class="card">
-    <h2>📝 Isi Laporan Barang Hilang/Ditemukan</h2>
+    <h2>📋 Isi Laporan Barang Hilang/Ditemukan</h2>
     <p>Gunakan form resmi berikut agar laporan tersimpan di Google Sheets dan bisa diakses semua orang.</p>
-    
-    <!-- Tombol menuju form -->
     <a href="https://forms.gle/C5vjtsrWTe5XCW8R8" target="_blank">
       <button>Isi Laporan via Google Form</button>
     </a>
+  </section>
 
-    <p style="margin-top:15px; color:#666; font-size:14px;">
-      Catatan: Form tidak bisa ditampilkan langsung di halaman karena ada pertanyaan upload file. 
-      Klik tombol di atas untuk membuka form di tab baru.
-    </p>
+  <!-- Barang Hilang -->
+  <section id="hilang" class="card">
+    <h2>🚨 Barang Hilang</h2>
+    <div id="hilangList"></div>
+  </section>
+
+  <!-- Barang Ditemukan -->
+  <section id="temuan" class="card">
+    <h2>🔍 Barang Ditemukan</h2>
+    <div id="temuanList"></div>
   </section>
 
   <!-- Kontak Admin -->
@@ -64,6 +73,37 @@
 <footer>
   &copy; 2025 Universitas Sriwijaya - Lost & Found Kampus
 </footer>
+
+<script>
+  fetch("https://sheetdb.io/api/v1/irxt8bnofe2d8")
+    .then(response => response.json())
+    .then(data => {
+      const hilangList = document.getElementById("hilangList");
+      const temuanList = document.getElementById("temuanList");
+
+      data.forEach(item => {
+        if (!item.Status) return;
+        const status = item.Status.toLowerCase();
+        const card = document.createElement("div");
+        card.className = "item";
+        card.innerHTML = `
+          <strong>${item["Nama Barang"] || "Tanpa nama"}</strong> (${item.Status})<br/>
+          Lokasi: ${item.Lokasi || "-"}<br/>
+          Deskripsi: ${item.Deskripsi || "-"}<br/>
+          Kontak: ${item.Telepon || "-"}<br/>
+          ${item.Foto ? `<img src="${item.Foto}" alt="Foto barang" />` : ""}
+        `;
+        if (status === "hilang") {
+          hilangList.appendChild(card);
+        } else if (status === "ditemukan") {
+          temuanList.appendChild(card);
+        }
+      });
+    })
+    .catch(error => {
+      console.error("Gagal mengambil data:", error);
+    });
+</script>
 
 </body>
 </html>
